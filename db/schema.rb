@@ -36,16 +36,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_02_071036) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "saved_searches", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.jsonb "filters", default: {}
-    t.string "name", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["filters"], name: "index_saved_searches_on_filters", using: :gin
-    t.index ["user_id"], name: "index_saved_searches_on_user_id"
-  end
-
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -69,7 +59,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_02_071036) do
     t.index ["user_id"], name: "index_watchlist_items_on_user_id"
   end
 
-  add_foreign_key "saved_searches", "users"
   add_foreign_key "watchlist_items", "properties"
   add_foreign_key "watchlist_items", "users"
 end

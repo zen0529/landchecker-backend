@@ -14,9 +14,6 @@ Rails.application.routes.draw do
 
       # Watchlist routes
       resources :watchlist_items, only: [:index, :create, :destroy, :update]
-
-      # Saved searches routes
-      resources :saved_searches, only: [:index, :create, :destroy]
     end
   end
 end
