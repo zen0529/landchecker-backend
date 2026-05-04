@@ -1,6 +1,6 @@
 # LandChecker Backend 🚀
 
-LandChecker is a robust Rails API designed for property search and management. This backend service handles property data, user watchlists, and saved searches, providing a high-performance foundation for real estate applications.
+LandChecker is a robust Rails API designed for property search and management. This backend service handles property data, user watchlists, and real-time notifications via WebSockets, providing a high-performance foundation for real estate applications.
 
 ## 🛠 Prerequisites
 
@@ -9,6 +9,7 @@ Ensure you have the following installed on your local machine:
 - **Ruby**: `3.4.9` (as specified in `.ruby-version`)
 - **Rails**: `8.1.3`
 - **PostgreSQL**: Ensure the Postgres service is running locally.
+- **Redis**: `7.x` — required for ActionCable WebSocket broadcasting.
 
 ## 🚀 Local Setup
 
@@ -27,7 +28,31 @@ cd landchecker-backend
 bundle install
 ```
 
-### 3. Database Setup
+### 3. Start Redis
+
+ActionCable uses Redis as its pub/sub adapter for real-time WebSocket broadcasts. Make sure Redis is running before starting the Rails server.
+
+**Ubuntu / WSL:**
+```bash
+sudo apt update && sudo apt install redis-server -y
+sudo service redis start
+```
+
+**macOS (Homebrew):**
+```bash
+brew install redis
+brew services start redis
+```
+
+Verify Redis is running:
+```bash
+redis-cli ping
+# Expected output: PONG
+```
+
+> Redis runs on `localhost:6379` by default. The `config/cable.yml` is already configured to use this in development — no extra setup needed.
+
+### 4. Database Setup
 
 This project uses PostgreSQL. Make sure your database service is active, then run:
 
@@ -38,12 +63,16 @@ bin/rails db:seed
 
 _Note: The `db:seed` command will populate your database with sample properties, users, and watchlist items._
 
-### 4. Run the Application
+### 5. Run the Application
 
-Start the Rails server on port 3000:
+You will need **two terminals** running simultaneously:
 
 ```bash
+# Terminal 1 — Rails server
 rails s -p 3000
+
+# Terminal 2 — (optional) Redis, if not running as a background service
+redis-server
 ```
 
 Alternatively, you can use the setup script which installs dependencies and prepares the database automatically:
@@ -60,20 +89,33 @@ Maintain code quality by running the test suite:
 bin/rails test
 ```
 
-## 🔑 Development Credentials
+## For testing websocket(do this in rails console)
 
-You can use the following accounts to test the API in development:
+### Find a watchlisted property
+item = WatchlistItem.includes(:property).first
+property = item.property
 
-| Email                 | Password   | Role                 |
-| :-------------------- | :--------- | :------------------- |
-| `tester123@email.com` | `test1234` | Admin / Default User |
+puts "Property: #{property.title}"
+puts "Current price: #{property.price}"
+
+### Change the price
+old_price = property.price
+property.update!(price: old_price - 50_000)
+
+puts "New price: #{property.price}"
+
+note: ensure the watchlisted property is wishlisted into the logged account
 
 ## 🏗 Key Technologies
 
 - **Framework**: Ruby on Rails 8.1.3 (API Mode)
 - **Database**: PostgreSQL
 - **Authentication**: JWT (JSON Web Tokens) & BCrypt
+- **Real-time**: ActionCable (WebSockets) backed by Redis
 - **Background Jobs**: Solid Queue
 - **Caching**: Solid Cache
-- **Real-time**: Solid Cable
 - **Data Generation**: Faker (for seeds)
+
+## ⚙️ Environment Variables
+
+> In development, Redis defaults to `redis://localhost:6379/1` and no env var is needed.
