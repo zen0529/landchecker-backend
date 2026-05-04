@@ -89,6 +89,23 @@ Maintain code quality by running the test suite:
 bin/rails test
 ```
 
+## For testing websocket(do this in rails console)
+
+### Find a watchlisted property
+item = WatchlistItem.includes(:property).first
+property = item.property
+
+puts "Property: #{property.title}"
+puts "Current price: #{property.price}"
+
+### Change the price
+old_price = property.price
+property.update!(price: old_price - 50_000)
+
+puts "New price: #{property.price}"
+
+note: ensure the watchlisted property is wishlisted into the logged account
+
 ## 🏗 Key Technologies
 
 - **Framework**: Ruby on Rails 8.1.3 (API Mode)
