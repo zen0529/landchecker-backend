@@ -101,10 +101,4 @@ bin/rails test
 
 ## ⚙️ Environment Variables
 
-For production, set the following environment variable so the Redis URL is not hardcoded:
-
-| Variable | Description | Example |
-| :------- | :---------- | :------ |
-| `REDIS_URL` | Redis connection URL (production only) | `redis://:password@your-redis-host.com:6379` |
-
 > In development, Redis defaults to `redis://localhost:6379/1` and no env var is needed.
